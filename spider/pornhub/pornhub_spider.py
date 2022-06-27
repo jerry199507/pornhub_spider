@@ -91,6 +91,8 @@ class PornhubSpider(object):
         # cmd = "ps -ef|grep chrome|grep -v grep |awk '{print $2}'|xargs kill -9"
         # p = subprocess.Popen(cmd, shell=True)
         # p.wait()
+        print('\n')
+        print('\n')
         print('-------------------------爬取结束-------------------------')
 
 
