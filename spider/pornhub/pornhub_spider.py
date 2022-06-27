@@ -15,7 +15,7 @@ CONCURRENCY = 5
 semaphore = asyncio.Semaphore(CONCURRENCY)
 
 sys.path.append(os.path.abspath("../../"))
-from config.config import VIDEO_PATH, EXCEL_PATH, logging
+from config.config import VIDEO_PATH, EXCEL_PATH
 from service.mkdir import mkdir
 from service.download_video import download_video
 
@@ -81,7 +81,7 @@ class PornhubSpider(object):
                 save_path = os.path.join(self.path, video_name)
                 await download_video(download_url, save_path, session, headers=self.headers)
             except Exception as e:
-                logging.error(f"爬取失败：{url}, 错误信息:{e}")
+                print(f"爬取失败：{url}, 错误信息:{e}")
             finally:
                 await page.close()
                 await browser.close()
