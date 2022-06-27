@@ -1,5 +1,7 @@
 # 环境 python3.8
-1, 拉取代码 
+
+
+1, 拉取代码   
 git clone https://github.com/jerry199507/pornhub_spider.git  
 2, 安装依赖库   
 cd config     
