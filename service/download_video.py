@@ -32,6 +32,7 @@ async def download_video(url, path, session, headers, count=16):
     下载视频
     """
     headers_1 = {'Range': 'bytes=0-0'}.update(headers)
+    name = path[-10:]
     content_length = await get_content_length(url, session, headers_1)
     fp = open(path, 'wb')
     fp.truncate(content_length)             # 创建和视频一样大小的文件
@@ -55,7 +56,7 @@ async def download_video(url, path, session, headers, count=16):
         }
         headers_2.update(headers)  # 合并请求头
         queue.put_nowait([session, path, url, start, headers_2])
-    with tqdm(total=content_length, unit='', desc=f'下载：{path}', unit_divisor=1024, ascii=True,
+    with tqdm(total=content_length, unit='', desc=f'下载：{name}', unit_divisor=1024, ascii=True,
               unit_scale=True) as bar:
         await asyncio.gather(*[__down_video(bar, queue) for _ in range(count)])
 
