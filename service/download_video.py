@@ -84,6 +84,5 @@ async def __down_video(bar, queue):
                             bar.update(len(b))
                         break
             except Exception as e:
-                print(e)
                 await asyncio.sleep(3)
                 continue
