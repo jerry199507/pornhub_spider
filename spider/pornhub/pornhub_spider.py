@@ -11,7 +11,7 @@ import sys
 import subprocess
 
 
-CONCURRENCY = 5
+CONCURRENCY = 3
 semaphore = asyncio.Semaphore(CONCURRENCY)
 
 sys.path.append(os.path.abspath("../../"))
