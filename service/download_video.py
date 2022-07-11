@@ -4,10 +4,8 @@ import sys
 import os
 
 sys.path.append(os.path.abspath("../"))
-from service.retry import retry
 
 
-@retry
 async def get_redirect_url(url, session):
     """
     获取重定向后的视频链接
@@ -17,7 +15,6 @@ async def get_redirect_url(url, session):
         return new_url
 
 
-@retry
 async def get_content_length(url, session, headers):
     """
     获取视频文件大小
@@ -27,12 +24,11 @@ async def get_content_length(url, session, headers):
         return content_length
 
 
-async def download_video(url, path, session, headers, count=16):
+async def download_video(url, path, session, headers, count=8):
     """
     下载视频
     """
     headers_1 = {'Range': 'bytes=0-0'}.update(headers)
-    name = path[-10:]
     content_length = await get_content_length(url, session, headers_1)
     fp = open(path, 'wb')
     fp.truncate(content_length)             # 创建和视频一样大小的文件
@@ -56,7 +52,7 @@ async def download_video(url, path, session, headers, count=16):
         }
         headers_2.update(headers)  # 合并请求头
         queue.put_nowait([session, path, url, start, headers_2])
-    with tqdm(total=content_length, unit='', desc=f'下载：{name}', unit_divisor=1024, ascii=True,
+    with tqdm(total=content_length, unit='', desc=f'下载：{path}', unit_divisor=1024, ascii=True,
               unit_scale=True) as bar:
         await asyncio.gather(*[__down_video(bar, queue) for _ in range(count)])
 
@@ -73,17 +69,11 @@ async def __down_video(bar, queue):
     while not queue.empty():
         task = await queue.get()
         session, path, video_url, start, headers = task[0], task[1], task[2], task[3], task[4]
-        while True:
-            try:
-                async with session.get(video_url, headers=headers) as resp:
-                    with open(path, 'rb+') as f:
-                        # 写入位置，指针移到指定位置
-                        f.seek(start)
-                        async for b in resp.content.iter_chunked(1024 * 1024):
-                            f.write(b)
-                            # 更新进度条，每次请求得到的长度
-                            bar.update(len(b))
-                        break
-            except Exception as e:
-                await asyncio.sleep(3)
-                continue
+        async with session.get(video_url, headers=headers) as resp:
+            with open(path, 'rb+') as f:
+                # 写入位置，指针移到指定位置
+                f.seek(start)
+                async for b in resp.content.iter_chunked(1024 * 1024):
+                    f.write(b)
+                    # 更新进度条，每次请求得到的长度
+                    bar.update(len(b))
